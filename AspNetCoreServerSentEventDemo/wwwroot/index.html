@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Server Sent Event Sample</title>
+</head>
+
+<body>
+    <p>Open your web browser's console to see the eventing.</p>
+    <button id="payroll1">Run Payroll 1</button>
+    <button id="payroll2">Run Payroll 2</button>
+    <script type="text/javascript">
+
+        var source;
+
+        function listenForServerEvents(url) {
+            if (source) source.close();
+
+            source = new EventSource(url);
+
+            source.onmessage = function (event) {
+                console.log('onmessage: ' + event.data);
+                if ('END-OF-STREAM' === event.data) {
+                    source.close(); // stop retry
+                }
+            };
+
+            source.onopen = function (event) {
+                console.log('onopen');
+            };
+
+            source.onerror = function (event) {
+                console.log('onerror');
+            };
+        }
+
+
+        document.getElementById("payroll1").addEventListener("click", function () {
+            listenForServerEvents("api/sse/payroll1");
+        });
+
+        document.getElementById("payroll2").addEventListener("click", function () {
+            listenForServerEvents("api/sse/payroll2");
+        });
+    </script>
+</body>
+
+</html>
